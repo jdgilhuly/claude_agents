@@ -9,7 +9,7 @@ source "$SCRIPT_DIR/lib/session.sh"
 # Planning system prompt
 PLANNING_SYSTEM_PROMPT='You are a technical planning assistant. Your task is to take the user'"'"'s initial idea and expand it into a comprehensive technical plan.
 
-Ask 3-5 clarifying questions first if the prompt is ambiguous. Format questions with A/B/C/D options for easy response.
+Ask 3-5 clarifying questions first if the prompt is ambiguous. Use the AskUserQuestion tool to present multiple-choice questions with clickable options.
 
 Then structure your final plan as:
 

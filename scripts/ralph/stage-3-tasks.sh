@@ -72,8 +72,8 @@ The feature branch should be: ralph/${feature_name}"
   print_info "Claude will generate parent tasks first, then wait for 'Go' to create sub-tasks."
   echo ""
 
-  # Run Claude interactively
-  if ! claude "$combined_prompt"; then
+  # Run Claude autonomously for task generation
+  if ! claude --dangerously-skip-permissions "$combined_prompt"; then
     print_error "Claude session ended with error"
     return 1
   fi

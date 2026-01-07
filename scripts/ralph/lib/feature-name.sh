@@ -1,9 +1,9 @@
 #!/bin/bash
 # feature-name.sh - Extract feature name from prompt
 
-# Dependencies
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/ui.sh"
+# Dependencies - use unique var name to avoid overwriting parent's SCRIPT_DIR
+_FEATURE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$_FEATURE_DIR/ui.sh"
 
 # Extract a kebab-case feature name from a prompt
 # Uses simple heuristics - can be overridden by user
@@ -51,12 +51,13 @@ confirm_feature_name() {
   local suggested
   suggested=$(extract_feature_name "$prompt")
 
-  echo ""
-  print_info "Suggested feature name: $suggested"
-  read -p "Feature name (Enter to accept, or type new name): " user_input
+  # Output prompts to stderr so they don't get captured
+  echo "" >&2
+  print_info "Suggested feature name: $suggested" >&2
+  read -p "Feature name (Enter to accept, or type new name): " user_input 2>&1 >&2
 
   if [ -n "$user_input" ]; then
-    # Sanitize user input
+    # Sanitize user input - only this goes to stdout
     echo "$user_input" | tr '[:upper:]' '[:lower:]' | tr -cs '[:alnum:]' '-' | sed 's/^-//' | sed 's/-$//'
   else
     echo "$suggested"

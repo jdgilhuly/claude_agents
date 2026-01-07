@@ -61,7 +61,7 @@ $prd_instructions
 ---
 
 IMPORTANT:
-1. Ask 3-5 clarifying questions first if anything is ambiguous (format as 1A, 1B, 2A, 2B, etc.)
+1. Ask 3-5 clarifying questions first if anything is ambiguous. Use the AskUserQuestion tool to present clickable multiple-choice options.
 2. After I answer, generate the complete PRD
 3. Save the PRD to: $output_file"
 
@@ -69,8 +69,8 @@ IMPORTANT:
   print_info "Claude will ask clarifying questions based on the plan."
   echo ""
 
-  # Run Claude interactively
-  if ! claude "$combined_prompt"; then
+  # Run Claude interactively (auto-accept edits but keep interactive questions)
+  if ! claude --permission-mode acceptEdits "$combined_prompt"; then
     print_error "Claude session ended with error"
     return 1
   fi

@@ -7,7 +7,7 @@ To guide an AI assistant in creating a detailed Product Requirements Document (P
 ## Process
 
 1.  **Receive Initial Prompt:** The user provides a brief description or request for a new feature or functionality.
-2.  **Ask Clarifying Questions:** Before writing the PRD, the AI *must* ask only the most essential clarifying questions needed to write a clear PRD. Limit questions to 3-5 critical gaps in understanding. The goal is to understand the "what" and "why" of the feature, not necessarily the "how" (which the developer will figure out). Make sure to provide options in letter/number lists so I can respond easily with my selections.
+2.  **Ask Clarifying Questions:** Before writing the PRD, the AI *must* ask only the most essential clarifying questions needed to write a clear PRD. Limit questions to 3-5 critical gaps in understanding. The goal is to understand the "what" and "why" of the feature, not necessarily the "how" (which the developer will figure out). Use the AskUserQuestion tool to present clickable multiple-choice options.
 3.  **Generate PRD:** Based on the initial prompt and the user's answers to the clarifying questions, generate a PRD using the structure outlined below.
 4.  **Save PRD:** Save the generated document as `prd-[feature-name].md` inside the `/tasks` directory.
 
@@ -24,31 +24,11 @@ Ask only the most critical questions needed to write a clear PRD. Focus on areas
 
 ### Formatting Requirements
 
-- **Number all questions** (1, 2, 3, etc.)
-- **List options for each question as A, B, C, D, etc.** for easy reference
-- Make it simple for the user to respond with selections like "1A, 2C, 3B"
+Use the **AskUserQuestion tool** to present questions with clickable multiple-choice options. This provides a better user experience than text-based A/B/C lists.
 
-### Example Format
-
-```
-1. What is the primary goal of this feature?
-   A. Improve user onboarding experience
-   B. Increase user retention
-   C. Reduce support burden
-   D. Generate additional revenue
-
-2. Who is the target user for this feature?
-   A. New users only
-   B. Existing users only
-   C. All users
-   D. Admin users only
-
-3. What is the expected timeline for this feature?
-   A. Urgent (1-2 weeks)
-   B. High priority (3-4 weeks)
-   C. Standard (1-2 months)
-   D. Future consideration (3+ months)
-```
+- Each question should have 2-4 clear options
+- Include helpful descriptions for each option
+- Group related questions together when possible
 
 ## PRD Structure
 

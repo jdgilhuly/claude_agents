@@ -78,7 +78,7 @@ Create a JSON file with this structure:
 Save the result to: $prd_json_file"
 
   # Run Claude to convert tasks (with write permission)
-  if ! claude --dangerously-skip-permissions --print "$conversion_prompt"; then
+  if ! claude --dangerously-skip-permissions "$conversion_prompt"; then
     print_warning "Task conversion may have failed - please verify prd.json"
   fi
 
@@ -160,7 +160,6 @@ EOF
     # Run Claude with full permissions for implementation
     local OUTPUT
     OUTPUT=$(claude --dangerously-skip-permissions \
-      --print \
       "$ralph_prompt" 2>&1 | tee /dev/stderr) || true
 
     # Check for completion signal

@@ -1,9 +1,9 @@
 #!/bin/bash
 # session.sh - Session management for Ralph workflow
 
-# Dependencies
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/ui.sh"
+# Dependencies - use unique var name to avoid overwriting parent's SCRIPT_DIR
+_SESSION_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$_SESSION_DIR/ui.sh"
 
 # Default paths (can be overridden)
 RALPH_DIR="${RALPH_DIR:-.ralph}"
@@ -36,23 +36,26 @@ init_session() {
   # Save original prompt
   echo "$prompt" > "$session_dir/prompt_original.txt"
 
-  # Create state file
-  cat > "$session_dir/state.json" << EOF
-{
-  "session_id": "$session_id",
-  "created_at": "$timestamp",
-  "updated_at": "$timestamp",
-  "original_prompt": $(echo "$prompt" | jq -Rs .),
-  "feature_name": "$feature_name",
-  "current_stage": 1,
-  "stages": {
-    "1_planning": { "status": "pending", "output_file": null, "started_at": null, "completed_at": null },
-    "2_prd": { "status": "pending", "output_file": null, "started_at": null, "completed_at": null },
-    "3_tasks": { "status": "pending", "output_file": null, "started_at": null, "completed_at": null },
-    "4_ralph": { "status": "pending", "output_file": null, "started_at": null, "completed_at": null }
-  }
-}
-EOF
+  # Create state file using jq for proper JSON escaping
+  jq -n \
+    --arg sid "$session_id" \
+    --arg ts "$timestamp" \
+    --arg prompt "$prompt" \
+    --arg feature "$feature_name" \
+    '{
+      session_id: $sid,
+      created_at: $ts,
+      updated_at: $ts,
+      original_prompt: $prompt,
+      feature_name: $feature,
+      current_stage: 1,
+      stages: {
+        "1_planning": { status: "pending", output_file: null, started_at: null, completed_at: null },
+        "2_prd": { status: "pending", output_file: null, started_at: null, completed_at: null },
+        "3_tasks": { status: "pending", output_file: null, started_at: null, completed_at: null },
+        "4_ralph": { status: "pending", output_file: null, started_at: null, completed_at: null }
+      }
+    }' > "$session_dir/state.json"
 
   echo "$session_id"
 }

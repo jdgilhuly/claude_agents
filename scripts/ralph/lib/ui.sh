@@ -1,5 +1,6 @@
 #!/bin/bash
 # ui.sh - UI utilities for Ralph workflow
+# Note: This file is sourced, uses _UI_DIR to avoid overwriting parent's SCRIPT_DIR
 
 # Colors
 export GREEN='\033[0;32m'
