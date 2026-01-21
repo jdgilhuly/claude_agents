@@ -69,8 +69,8 @@ IMPORTANT:
   print_info "Claude will ask clarifying questions based on the plan."
   echo ""
 
-  # Run Claude interactively (auto-accept edits but keep interactive questions)
-  if ! claude --permission-mode acceptEdits "$combined_prompt"; then
+  # Run Claude with bypass permissions
+  if ! claude --dangerously-skip-permissions "$combined_prompt"; then
     print_error "Claude session ended with error"
     return 1
   fi

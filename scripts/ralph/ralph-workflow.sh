@@ -19,12 +19,14 @@ Ralph Workflow Orchestrator
 
 Usage:
   $(basename "$0") "<prompt>"                    Start new workflow
+  $(basename "$0") --greenfield "<prompt>"       Start new project (skip codebase context)
   $(basename "$0") --resume <session_id>         Resume existing session
   $(basename "$0") --continue                    Resume most recent session
   $(basename "$0") --list-sessions               List all sessions
   $(basename "$0") --resume <id> --from-stage N  Resume from specific stage
 
 Options:
+  --greenfield       Skip codebase context gathering (for new projects)
   --resume <id>      Resume a specific session by ID
   --continue         Resume the most recent session
   --from-stage <N>   Start from stage N (1-4) when resuming
@@ -39,7 +41,8 @@ Stages:
   4. Ralph       - Implement tasks iteratively
 
 Examples:
-  $(basename "$0") "generate a twitter clone"
+  $(basename "$0") "add user authentication"     # Gathers codebase context first
+  $(basename "$0") --greenfield "twitter clone"  # Skips context for new project
   $(basename "$0") --resume abc12345
   $(basename "$0") --continue --from-stage 3
 
@@ -52,9 +55,14 @@ parse_args() {
   RESUME_SESSION=""
   FROM_STAGE=""
   LIST_SESSIONS=false
+  GREENFIELD=false
 
   while [[ $# -gt 0 ]]; do
     case "$1" in
+      --greenfield)
+        GREENFIELD=true
+        shift
+        ;;
       --resume)
         RESUME_SESSION="$2"
         shift 2
@@ -118,9 +126,25 @@ run_workflow() {
   # Stage 1: Planning
   if [ "$start_stage" -le 1 ]; then
     local plan_file="$session_dir/plan_$(date +%s).md"
+    local context_file=""
+
+    # Gather codebase context unless --greenfield flag was used
+    if [ "$GREENFIELD" = false ]; then
+      source "$SCRIPT_DIR/lib/context-gather.sh"
+      context_file="$session_dir/codebase_context.md"
+      print_info "Gathering codebase context..."
+      if run_context_gathering "$original_prompt" "$session_id" "$context_file"; then
+        print_success "Context gathered: $context_file"
+      else
+        print_warning "Context gathering failed, continuing without context"
+        context_file=""
+      fi
+    else
+      print_info "Greenfield mode: skipping codebase context gathering"
+    fi
 
     source "$SCRIPT_DIR/stage-1-planning.sh"
-    if ! run_planning_stage "$original_prompt" "$session_id" "$plan_file"; then
+    if ! run_planning_stage "$original_prompt" "$session_id" "$plan_file" "$context_file"; then
       print_error "Planning stage failed"
       return 1
     fi

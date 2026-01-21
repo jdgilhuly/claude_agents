@@ -1,0 +1,108 @@
+.legend {
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 16px;
+  width: 220px;
+}
+
+.legend-title {
+  margin: 0 0 12px 0;
+  font-size: 12px;
+  font-weight: 600;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.legend-items {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13px;
+  color: #475569;
+}
+
+.legend-divider {
+  height: 1px;
+  background: #e2e8f0;
+  margin: 4px 0;
+}
+
+.legend-stage-icon {
+  width: 24px;
+  height: 24px;
+  background: #6366f1;
+  color: white;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.legend-decision-icon {
+  width: 20px;
+  height: 20px;
+  background: #fffbeb;
+  border: 2px solid #fbbf24;
+  transform: rotate(45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 2px;
+}
+
+.legend-decision-icon span {
+  transform: rotate(-45deg);
+  font-weight: 700;
+  font-size: 11px;
+  color: #b45309;
+}
+
+.legend-mode {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 2px 8px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.legend-mode.interactive {
+  background: #dbeafe;
+  color: #1d4ed8;
+}
+
+.legend-mode.autonomous {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.legend-status {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.legend-status.pending {
+  background: #e2e8f0;
+  border: 2px solid #cbd5e1;
+}
+
+.legend-status.in-progress {
+  background: #fef3c7;
+  border: 2px solid #fbbf24;
+}
+
+.legend-status.completed {
+  background: #dcfce7;
+  border: 2px solid #22c55e;
+}

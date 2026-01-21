@@ -1,0 +1,57 @@
+.decision-node {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.decision-node:hover .decision-diamond {
+  background: #fef3c7;
+  border-color: #f59e0b;
+  transform: rotate(45deg) scale(1.1);
+}
+
+.decision-diamond {
+  width: 48px;
+  height: 48px;
+  background: #fffbeb;
+  border: 2px solid #fbbf24;
+  transform: rotate(45deg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(251, 191, 36, 0.2);
+}
+
+.decision-icon {
+  transform: rotate(-45deg);
+  font-weight: 700;
+  font-size: 18px;
+  color: #b45309;
+}
+
+.decision-label {
+  margin-top: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #92400e;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.decision-options-preview {
+  margin-top: 4px;
+  display: flex;
+  gap: 4px;
+}
+
+.option-key {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: #78716c;
+  background: #f5f5f4;
+  padding: 1px 4px;
+  border-radius: 3px;
+}
