@@ -9,7 +9,7 @@ source "$SCRIPT_DIR/lib/session.sh"
 # Planning system prompt
 PLANNING_SYSTEM_PROMPT='You are a technical planning assistant. Your task is to take the user'"'"'s initial idea and expand it into a comprehensive technical plan.
 
-Ask 3-5 clarifying questions first if the prompt is ambiguous. Use the AskUserQuestion tool to present multiple-choice questions with clickable options.
+Ask as many clarifying questions as needed first if the prompt is ambiguous. Use the AskUserQuestion tool to present multiple-choice questions with clickable options.
 
 Then structure your final plan as:
 
@@ -32,7 +32,7 @@ Then structure your final plan as:
 [Key endpoints or interactions - REST/GraphQL/etc]
 
 ## Non-Goals / Out of Scope
-[What this project will NOT include in v1]
+[What this project will NOT include]
 
 ## Open Questions
 [Any remaining questions or decisions to be made]
@@ -62,7 +62,7 @@ run_planning_stage() {
 
 $prompt
 
-Follow the planning structure to create a comprehensive technical plan. Start by asking 3-5 clarifying questions if needed."
+Follow the planning structure to create a comprehensive technical plan. Start by asking as many clarifying questions as needed."
 
   # Run Claude in plan mode (interactive)
   # Using --append-system-prompt to add planning instructions
