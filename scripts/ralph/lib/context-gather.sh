@@ -2,8 +2,8 @@
 # context-gather.sh - Gather codebase context using Claude subagents
 # Spawns Explore subagents to understand project structure, patterns, and relevant code
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/ui.sh"
+_CONTEXT_GATHER_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+source "$_CONTEXT_GATHER_DIR/ui.sh"
 
 # Gather codebase context by spawning Explore subagents
 # Arguments:
