@@ -1,5 +1,14 @@
 # Ralph Agent Instructions
 
+## Iteration Briefing (READ FIRST)
+
+If this prompt begins with an "Iteration Briefing" section above, **trust it completely**:
+- It tells you exactly which story to work on
+- It shows current progress and remaining work
+- It lists the acceptance criteria to satisfy
+
+**Do not re-read all stories** - focus only on the current story from the briefing.
+
 ## IMPORTANT: Use TodoWrite for Task Tracking
 
 You MUST use the TodoWrite tool to track your implementation progress. Before starting any work:
@@ -34,12 +43,13 @@ After committing your changes, you MUST pass quality review before marking the s
 
 ## Your Task
 
-1. Read `scripts/ralph/prd.json`
-2. Read `scripts/ralph/progress.txt`
-   (check Codebase Patterns first)
-3. Check you're on the correct branch
-4. Pick highest priority story where `passes: false`
-5. **Use TodoWrite** to create task list for this story
+1. **If Iteration Briefing exists above**: Use it to identify your current story
+2. Read `scripts/ralph/progress.txt`:
+   - **Read fully**: "Codebase Patterns" section at the top
+   - **Skim only**: Recent story summaries (for patterns, not details)
+3. Read `scripts/ralph/prd.json` only for the current story's full details
+4. Check you're on the correct branch
+5. **Use TodoWrite** to create task list for the current story
 6. Implement that ONE story (updating todos as you go)
 7. Run typecheck and tests
 8. Update AGENTS.md files with learnings
@@ -48,19 +58,21 @@ After committing your changes, you MUST pass quality review before marking the s
 11. **QUALITY GATE**: Run pr-test-analyzer on the diff
 12. If issues found → fix, re-test, amend commit, re-run reviewers
 13. After both reviewers pass → Update prd.json: `passes: true`
-14. Append learnings to progress.txt (include reviewer feedback)
+14. Append learnings to progress.txt (keep concise - see format below)
 
 ## Progress Format
 
-APPEND to progress.txt:
+APPEND to progress.txt (**keep concise - 5-7 bullets max**):
 
 ## [Date] - [Story ID]
-- What was implemented
-- Files changed
-- **Learnings:**
+- What was implemented (1-2 bullets)
+- Key files changed (list only, no descriptions)
+- **Learnings** (only new patterns/gotchas):
   - Patterns discovered
   - Gotchas encountered
 ---
+
+**Important**: Old story summaries are automatically archived. Only recent context is kept in progress.txt to maintain focus.
 
 ## Codebase Patterns
 

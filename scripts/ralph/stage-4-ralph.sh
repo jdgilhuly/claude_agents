@@ -5,10 +5,13 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib/ui.sh"
 source "$SCRIPT_DIR/lib/session.sh"
+source "$SCRIPT_DIR/lib/context-manager.sh"
+source "$SCRIPT_DIR/lib/claude-invoke.sh"
 
 # Default settings
 MAX_ITERATIONS="${MAX_ITERATIONS:-10}"
 PAUSE_BETWEEN_ITERATIONS="${PAUSE_BETWEEN_ITERATIONS:-true}"
+MAX_PROGRESS_STORIES="${MAX_PROGRESS_STORIES:-3}"
 
 run_ralph_stage() {
   local tasks_file="$1"
@@ -78,7 +81,7 @@ Create a JSON file with this structure:
 Save the result to: $prd_json_file"
 
   # Run Claude to convert tasks (with write permission)
-  if ! claude --dangerously-skip-permissions "$conversion_prompt"; then
+  if ! ralph_claude "$conversion_prompt"; then
     print_warning "Task conversion may have failed - please verify prd.json"
   fi
 
@@ -147,8 +150,7 @@ EOF
     return 1
   fi
 
-  local ralph_prompt
-  ralph_prompt=$(cat "$SCRIPT_DIR/prompt.md")
+  local ralph_prompt_base="$SCRIPT_DIR/prompt.md"
 
   for i in $(seq 1 "$max_iterations"); do
     echo ""
@@ -157,10 +159,16 @@ EOF
     echo -e "${BOLD}═══════════════════════════════════════${NC}"
     echo ""
 
+    # Build iteration-specific prompt with dynamic briefing
+    local iteration_prompt_file
+    iteration_prompt_file=$(create_iteration_prompt "$ralph_prompt_base" "$prd_json_file" "$i" "$max_iterations")
+    local ralph_prompt
+    ralph_prompt=$(cat "$iteration_prompt_file")
+    rm -f "$iteration_prompt_file"
+
     # Run Claude with full permissions for implementation
     local OUTPUT
-    OUTPUT=$(claude --dangerously-skip-permissions \
-      "$ralph_prompt" 2>&1 | tee /dev/stderr) || true
+    OUTPUT=$(ralph_claude "$ralph_prompt" 2>&1 | tee /dev/stderr) || true
 
     # Check for completion signal
     if echo "$OUTPUT" | grep -q "<promise>COMPLETE</promise>"; then
@@ -179,6 +187,9 @@ EOF
     local remaining
     remaining=$(jq '[.userStories[] | select(.passes == false)] | length' "$prd_json_file" 2>/dev/null || echo "?")
     print_info "Remaining stories: $remaining"
+
+    # Rotate progress file to keep context bounded
+    rotate_progress_file "$progress_file"
 
     # Pause between iterations if enabled
     if [ "$PAUSE_BETWEEN_ITERATIONS" = "true" ] && [ "$i" -lt "$max_iterations" ]; then
@@ -209,6 +220,9 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     echo "Environment Variables:"
     echo "  MAX_ITERATIONS              Default max iterations (default: 10)"
     echo "  PAUSE_BETWEEN_ITERATIONS    Pause for review between iterations (default: true)"
+    echo "  MAX_PROGRESS_STORIES        Keep last N stories in progress.txt (default: 3)"
+    echo "  DISABLE_PROGRESS_ROTATION   Set to 'true' to disable progress rotation"
+    echo "  DISABLE_DYNAMIC_BRIEFING    Set to 'true' to disable iteration briefings"
     exit 1
   fi
 

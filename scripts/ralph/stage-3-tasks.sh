@@ -5,6 +5,7 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib/ui.sh"
 source "$SCRIPT_DIR/lib/session.sh"
+source "$SCRIPT_DIR/lib/claude-invoke.sh"
 
 TASKS_DIR="${TASKS_DIR:-tasks}"
 
@@ -73,7 +74,7 @@ The feature branch should be: ralph/${feature_name}"
   echo ""
 
   # Run Claude autonomously for task generation
-  if ! claude --dangerously-skip-permissions "$combined_prompt"; then
+  if ! ralph_claude "$combined_prompt"; then
     print_error "Claude session ended with error"
     return 1
   fi

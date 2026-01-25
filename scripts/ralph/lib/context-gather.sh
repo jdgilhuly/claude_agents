@@ -4,6 +4,10 @@
 
 _CONTEXT_GATHER_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$_CONTEXT_GATHER_DIR/ui.sh"
+source "$_CONTEXT_GATHER_DIR/claude-invoke.sh"
+
+# Configuration
+CONTEXT_GATHER_VERBOSE="${CONTEXT_GATHER_VERBOSE:-true}"
 
 # Gather codebase context by spawning Explore subagents
 # Arguments:
@@ -55,19 +59,53 @@ After all subagents complete, synthesize their findings into a structured markdo
 
 Output ONLY the markdown document - no additional commentary."
 
-  if claude --dangerously-skip-permissions --print "$context_prompt" > "$output_file" 2>/dev/null; then
-    # Check if output file has meaningful content
-    if [ -s "$output_file" ] && grep -q "^#" "$output_file"; then
-      return 0
+  # Create a log file for the full Claude session
+  local log_file="${output_file%.md}.log"
+
+  if [ "$CONTEXT_GATHER_VERBOSE" = "true" ]; then
+    echo ""
+    print_info "Claude activity (streaming):"
+    echo -e "${CYAN}────────────────────────────────────────${NC}"
+
+    # Stream Claude output to terminal AND capture to log file
+    # Use tee to show real-time activity
+    if ralph_claude "$context_prompt" 2>&1 | tee "$log_file"; then
+      echo -e "${CYAN}────────────────────────────────────────${NC}"
+      echo ""
+
+      # Extract just the markdown output (everything from first # heading)
+      if grep -q "^#" "$log_file"; then
+        # Extract from first markdown heading to end
+        sed -n '/^# /,$p' "$log_file" > "$output_file"
+        print_success "Context saved to: $output_file"
+        print_info "Full log saved to: $log_file"
+        return 0
+      else
+        print_warning "Context gathering produced no markdown output"
+        print_info "Check log file: $log_file"
+        return 1
+      fi
     else
-      print_warning "Context gathering produced empty or invalid output"
-      rm -f "$output_file"
+      echo -e "${CYAN}────────────────────────────────────────${NC}"
+      print_warning "Claude context gathering failed"
+      print_info "Check log file: $log_file"
       return 1
     fi
   else
-    print_warning "Claude context gathering failed"
-    rm -f "$output_file"
-    return 1
+    # Quiet mode - original behavior
+    if ralph_claude "$context_prompt" --print > "$output_file" 2>/dev/null; then
+      if [ -s "$output_file" ] && grep -q "^#" "$output_file"; then
+        return 0
+      else
+        print_warning "Context gathering produced empty or invalid output"
+        rm -f "$output_file"
+        return 1
+      fi
+    else
+      print_warning "Claude context gathering failed"
+      rm -f "$output_file"
+      return 1
+    fi
   fi
 }
 
@@ -80,6 +118,10 @@ if [[ "${BASH_SOURCE[0]}" == "${0}" ]]; then
     echo "  prompt       The feature request/prompt to gather context for"
     echo "  output_file  Where to save the context markdown"
     echo "  session_id   Optional session ID (for logging)"
+    echo ""
+    echo "Environment Variables:"
+    echo "  CONTEXT_GATHER_VERBOSE=true   Show Claude's activity in real-time (default: true)"
+    echo "  CONTEXT_GATHER_VERBOSE=false  Quiet mode, no streaming output"
     exit 1
   fi
 
