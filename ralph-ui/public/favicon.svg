@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <rect width="100" height="100" fill="#1a1a1a"/>
+  <!-- Conveyor belt -->
+  <rect x="10" y="40" width="80" height="20" rx="3" fill="#4a4a4a"/>
+  <line x1="20" y1="40" x2="20" y2="60" stroke="#3a3a3a" stroke-width="2"/>
+  <line x1="35" y1="40" x2="35" y2="60" stroke="#3a3a3a" stroke-width="2"/>
+  <line x1="50" y1="40" x2="50" y2="60" stroke="#3a3a3a" stroke-width="2"/>
+  <line x1="65" y1="40" x2="65" y2="60" stroke="#3a3a3a" stroke-width="2"/>
+  <line x1="80" y1="40" x2="80" y2="60" stroke="#3a3a3a" stroke-width="2"/>
+  <!-- Work stations -->
+  <rect x="15" y="20" width="15" height="18" rx="2" fill="#2a2a2a" stroke="#ff9f1c" stroke-width="2"/>
+  <rect x="42" y="20" width="15" height="18" rx="2" fill="#2a2a2a" stroke="#2ecc71" stroke-width="2"/>
+  <rect x="70" y="20" width="15" height="18" rx="2" fill="#2a2a2a" stroke="#3498db" stroke-width="2"/>
+  <!-- Story items -->
+  <rect x="25" y="45" width="12" height="10" rx="2" fill="#ff9f1c"/>
+  <rect x="55" y="45" width="12" height="10" rx="2" fill="#2ecc71"/>
+  <!-- Connection lines -->
+  <line x1="22" y1="38" x2="22" y2="40" stroke="#5a5a5a" stroke-width="2"/>
+  <line x1="50" y1="38" x2="50" y2="40" stroke="#5a5a5a" stroke-width="2"/>
+  <line x1="77" y1="38" x2="77" y2="40" stroke="#5a5a5a" stroke-width="2"/>
+</svg>

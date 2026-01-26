@@ -7,6 +7,7 @@ source "$SCRIPT_DIR/lib/ui.sh"
 source "$SCRIPT_DIR/lib/session.sh"
 source "$SCRIPT_DIR/lib/context-manager.sh"
 source "$SCRIPT_DIR/lib/claude-invoke.sh"
+source "$SCRIPT_DIR/lib/events.sh"
 
 # Default settings
 MAX_ITERATIONS="${MAX_ITERATIONS:-10}"
@@ -35,6 +36,8 @@ run_ralph_stage() {
   # Update stage status
   if [ -n "$session_id" ]; then
     update_stage "$session_id" "4_ralph" "in_progress" ""
+    # Emit session start event for visualization
+    emit_session_start "$session_id" "$feature_name" "$max_iterations"
   fi
 
   # Step 1: Convert tasks to prd.json format
@@ -107,6 +110,13 @@ Save the result to: $prd_json_file"
     ${EDITOR:-vim} "$prd_json_file"
   fi
 
+  # Emit PRD loaded event
+  if [ -n "$session_id" ]; then
+    local total_stories
+    total_stories=$(jq '.userStories | length' "$prd_json_file" 2>/dev/null || echo 0)
+    emit_prd_loaded "$session_id" "$total_stories" "ralph/$feature_name"
+  fi
+
   # Step 2: Create/switch to feature branch
   print_info "Step 2: Setting up feature branch..."
   local branch_name="ralph/$feature_name"
@@ -159,6 +169,16 @@ EOF
     echo -e "${BOLD}═══════════════════════════════════════${NC}"
     echo ""
 
+    # Get current story info for events
+    local current_story_id current_story_title
+    current_story_id=$(jq -r '[.userStories[] | select(.passes == false)][0].id // "None"' "$prd_json_file" 2>/dev/null)
+    current_story_title=$(jq -r '[.userStories[] | select(.passes == false)][0].title // "All complete"' "$prd_json_file" 2>/dev/null)
+
+    # Emit iteration start event
+    if [ -n "$session_id" ]; then
+      emit_iteration_start "$session_id" "$i" "$max_iterations" "$current_story_id" "$current_story_title"
+    fi
+
     # Build iteration-specific prompt with dynamic briefing
     local iteration_prompt_file
     iteration_prompt_file=$(create_iteration_prompt "$ralph_prompt_base" "$prd_json_file" "$i" "$max_iterations")
@@ -178,15 +198,24 @@ EOF
       # Update session state
       if [ -n "$session_id" ]; then
         update_stage "$session_id" "4_ralph" "completed" "$prd_json_file"
+        emit_session_end "$session_id" "completed"
       fi
 
       return 0
     fi
 
     # Check remaining stories
-    local remaining
+    local remaining completed_count total_count
     remaining=$(jq '[.userStories[] | select(.passes == false)] | length' "$prd_json_file" 2>/dev/null || echo "?")
+    completed_count=$(jq '[.userStories[] | select(.passes == true)] | length' "$prd_json_file" 2>/dev/null || echo 0)
+    total_count=$(jq '.userStories | length' "$prd_json_file" 2>/dev/null || echo 0)
     print_info "Remaining stories: $remaining"
+
+    # Emit iteration end and PRD update events
+    if [ -n "$session_id" ]; then
+      emit_iteration_end "$session_id" "$i" "$remaining"
+      emit_prd_updated "$session_id" "$completed_count" "$total_count"
+    fi
 
     # Rotate progress file to keep context bounded
     rotate_progress_file "$progress_file"
@@ -203,6 +232,12 @@ EOF
   echo ""
   print_warning "Max iterations ($max_iterations) reached without completion"
   print_info "You can resume with: $0 $tasks_file $feature_name $session_id"
+
+  # Emit session end event for incomplete run
+  if [ -n "$session_id" ]; then
+    emit_session_end "$session_id" "incomplete" "Max iterations reached"
+  fi
+
   return 1
 }
 

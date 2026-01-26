@@ -4,6 +4,7 @@
 # Dependencies - use unique var name to avoid overwriting parent's SCRIPT_DIR
 _SESSION_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$_SESSION_DIR/ui.sh"
+source "$_SESSION_DIR/events.sh"
 
 # Default paths (can be overridden)
 RALPH_DIR="${RALPH_DIR:-.ralph}"
@@ -32,6 +33,9 @@ init_session() {
 
   # Create session directory
   mkdir -p "$session_dir"
+
+  # Initialize events directory for this session
+  init_events_dir "$session_id"
 
   # Save original prompt
   echo "$prompt" > "$session_dir/prompt_original.txt"
